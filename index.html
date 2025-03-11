@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat IA - Foz do Iguaçu</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="chat-container">
+        <header>
+            <img src="logo_foz.png" alt="Prefeitura de Foz do Iguaçu" class="logo-img">
+            <h1>Chat IA - Prefeitura de Foz do Iguaçu</h1>
+        </header>
+        <div class="chat-box" id="chat-box">
+            <div class="message bot">Bem-vindo ao Chat IA de Foz do Iguaçu! Como posso ajudar?</div>
+        </div>
+        <div class="input-area">
+            <input type="text" id="user-input" placeholder="Digite sua mensagem...">
+            <button id="send-btn">Enviar</button>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById("send-btn").addEventListener("click", sendMessage);
+        document.getElementById("user-input").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+
+                // Gera um ID único para identificar a sessão do usuário
+        const sessionId = localStorage.getItem("sessionId") || Math.random().toString(36).substr(2, 9);
+        localStorage.setItem("sessionId", sessionId);
+
+        function showTyping() {
+            const chatBox = document.getElementById("chat-box");
+            const typingBubble = document.createElement("div");
+            typingBubble.id = "isTyping";
+            typingBubble.classList.add("chat-bubble");
+            typingBubble.innerHTML = `
+                <div class="typing">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            `;
+            chatBox.appendChild(typingBubble);
+            chatBox.scrollTop = chatBox.scrollHeight;
+        }
+
+        function hideTyping() {
+            const typingBubble = document.getElementById("isTyping");
+            if (typingBubble) {
+                typingBubble.remove();
+            }
+        }
+
+
+        async function sendMessage() {
+            const inputField = document.getElementById("user-input");
+            const message = inputField.value.trim();
+            if (message === "") return;
+
+            const chatBox = document.getElementById("chat-box");
+
+            // Exibir a mensagem do usuário no chat
+            const userMessage = document.createElement("div");
+            userMessage.classList.add("message", "user");
+            userMessage.textContent = message;
+            chatBox.appendChild(userMessage);
+            inputField.value = "";
+
+            showTyping();
+
+            try {
+                const response = await fetch("https://n8n-h1.pmfi.pr.gov.br/webhook/b220b05a-adc0-4f1f-a949-cb6528f3bd2d", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ 
+                        session_id: sessionId, // Enviar o ID único da sessão
+                        text: message
+                    })
+                });
+
+                const data = await response.json();
+
+                // Exibir a resposta da IA no chat
+                const botMessage = document.createElement("div");
+                botMessage.classList.add("message", "bot");
+                botMessage.innerHTML = data.text.replace(/\n/g, "<br>");
+                chatBox.appendChild(botMessage);
+                chatBox.scrollTop = chatBox.scrollHeight;
+
+            } catch (error) {
+                console.error("Erro ao conectar com a IA:", error);
+            } finally {
+                hideTyping();
+            }
+        }
+
+    </script>
+</body>
+</html>

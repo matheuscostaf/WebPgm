@@ -1,0 +1,234 @@
+.chat-bubble {
+    background-color:#a5d6a7;
+    color: #1b5e20;
+    padding:16px 28px;
+    -webkit-border-radius: 20px;
+    -webkit-border-bottom-left-radius: 2px;
+    -moz-border-radius: 20px;
+    -moz-border-radius-bottomleft: 2px;
+    border-radius: 20px;
+    border-bottom-left-radius: 2px;
+    display:inline-block;
+    max-width: 30px;
+  }
+  .typing {
+    align-items: center;
+    display: flex;
+    height: 10px;
+  }
+  .typing .dot {
+    animation: mercuryTypingAnimation 1.8s infinite ease-in-out;
+    background-color: #000 ;
+    border-radius: 50%;
+    height: 7px;
+    margin-right: 4px;
+    vertical-align: middle;
+    width: 7px;
+    display: inline-block;
+  }
+  .typing .dot:nth-child(1) {
+    animation-delay: 200ms;
+  }
+  .typing .dot:nth-child(2) {
+    animation-delay: 300ms;
+  }
+  .typing .dot:nth-child(3) {
+    animation-delay: 400ms;
+  }
+  .typing .dot:last-child {
+    margin-right: 0;
+  }
+  
+  @keyframes mercuryTypingAnimation {
+    0% {
+      transform: translateY(0px);
+      background-color:#6CAD96; 
+    }
+    28% {
+      transform: translateY(-7px);
+      background-color:#1b5e20; 
+    }
+    44% {
+      transform: translateY(0px);
+      background-color: #1b5e20;
+    }
+  }
+
+body {
+    font-family: 'Poppins', sans-serif;
+    background-color: #ffffff;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
+}
+
+.chat-container {
+  width: 95%;
+  max-width: 800px;
+  height: 90vh; /* Faz o chat ocupar 90% da altura da tela */
+  margin: 2vh 0; /* Apenas um pequeno espaço acima e abaixo */
+  background: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+header {
+  background: #ffffff;
+  color: #005a2c;
+  padding: 10px 5px; /* Reduzindo a altura do cabeçalho */
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+
+header h1 {
+    font-size: 16px;
+    font-weight: 600;
+    margin-top: 20px; /* Espaçamento aumentado entre a logo e o título Chat IA */
+}
+
+.logo-img {
+  width: 100%;
+  max-width: 200px; /* Reduzindo o tamanho da logo */
+  height: auto;
+  margin: 10px 0; /* Reduzindo o espaço vertical */
+}
+
+
+.chat-box {
+    flex-grow: 1;
+    padding: 20px;
+    height: 350px;
+    max-height: calc(100vh - 180px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    background: #f9f9f9;
+    border-bottom: 3px solid #00796b;
+}
+
+.message {
+    padding: 14px;
+    border-radius: 12px;
+    max-width: 80%;
+    word-wrap: break-word;
+    font-size: 16px;
+    animation: fadeIn 0.3s ease-in-out;
+}
+
+.user {
+    background: #00796b;
+    color: white;
+    align-self: flex-end;
+}
+
+.bot {
+    background: #a5d6a7;
+    color: #1b5e20;
+    align-self: flex-start;
+    -webkit-border-radius: 20px;
+    -webkit-border-bottom-left-radius: 2px;
+    -moz-border-radius: 20px;
+    -moz-border-radius-bottomleft: 2px;
+    border-radius: 20px;
+    border-bottom-left-radius: 2px;
+}
+
+.input-area {
+    display: flex;
+    padding: 15px;
+    border-top: 2px solid #00796b;
+    background: white;
+}
+
+input {
+    flex: 1;
+    padding: 14px;
+    border: 2px solid #00796b;
+    outline: none;
+    border-radius: 8px;
+    font-size: 16px;
+    transition: 0.2s;
+}
+
+input:focus {
+    border-color: #004d40;
+}
+
+button {
+    background: #00796b;
+    color: white;
+    border: none;
+    padding: 14px 18px;
+    margin-left: 8px;
+    cursor: pointer;
+    border-radius: 8px;
+    transition: background 0.3s ease;
+    font-size: 16px;
+}
+
+button:hover {
+    background: #004d40;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(5px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.login-container {
+  width: 300px;
+  padding: 20px;
+  background: white;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  text-align: center;
+}
+
+h2 {
+  margin-bottom: 20px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+}
+
+.input-area button {
+  padding: 12px 20px; /* Reduzindo o tamanho do botão */
+  font-size: 16px;
+  border-radius: 8px;
+  background: #00796b;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.input-area button:hover {
+  background: #004d40;
+}
+
+.error-message {
+  color: red;
+  margin-top: 10px;
+}
+
+
