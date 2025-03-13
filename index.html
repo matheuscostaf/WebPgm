@@ -1,52 +1,385 @@
 <!DOCTYPE html>
-<html lang="pt">
+<html lang="pt-BR">
 <head>
+    <!-- //bWVsaG9yIGZyb250IGRvIGJyYXNpbCByb2RyaWdv -->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chat IA - Foz do Iguaçu</title>
-    <link rel="stylesheet" href="styles.css">
+    <title>Chat Interface</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        @keyframes slideUpFade {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            background: #4D6BFE;
+            border: none;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            color: white;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+        }
+
+        .menu-toggle:hover {
+            background: #3D5CFF;
+        }
+
+        .sidebar {
+            width: 280px;
+            background-color: #f9fbff;
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            z-index: 999;
+        }
+
+        .overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: 998;
+        }
+
+        @media (max-width: 768px) {
+            .menu-toggle {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .sidebar {
+                position: fixed;
+                left: 0;
+                top: 0;
+                bottom: 0;
+                transform: translateX(-100%);
+                box-shadow: none;
+            }
+
+            .sidebar.active {
+                transform: translateX(0);
+                box-shadow: 2px 0 10px rgba(0,0,0,0.1);
+            }
+
+            .overlay.active {
+                display: block;
+                opacity: 1;
+            }
+
+            .container {
+                padding-left: 0;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .input-container {
+                border-radius: 15px;
+                height: auto;
+                min-height: 60px;
+            }
+
+            .input-field {
+                font-size: 14px;
+            }
+
+            .send-button {
+                padding: 6px 12px;
+                font-size: 14px;
+            }
+
+            .message-content {
+                max-width: 85%;
+                font-size: 14px;
+            }
+        }
+
+        /* Animação para o botão do menu */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+            100% { transform: scale(1); }
+        }
+
+        .menu-toggle.new-message {
+            animation: pulse 1s infinite;
+            background-color: #22c55e;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background-color: #fff;
+            color: #F8FAFF;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 280px;
+            background-color: #f9fbff;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .sidebar-header {
+            padding: 20px;
+            padding-top: 75px;
+            justify-content: center;
+            border-bottom: 1px solid #fefefe;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo {
+            color: #4D6BFE;
+            font-size: 24px;
+        }
+
+        .menu-button {
+            width: 24px;
+            height: 24px;
+            color: #ABB2BD;
+            cursor: pointer;
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .chat-container {
+            width: 100%;
+            max-width: 900px;
+            margin: auto;
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            scroll-behavior: smooth;
+        }
+
+        /* Input Area */
+        .input-area {
+            width: 100%;
+            max-width: 900px;
+            margin: auto;
+            padding: 20px;
+            border-top: 1px solid #fefefe;
+        }
+
+        .input-container {
+            display: flex;
+            gap: 10px;
+            background-color: #f3f4f6;
+            padding: 12px;
+            border-radius: 8px;
+            max-width: 900px;
+            width: 100%;
+            height: 100px;
+            border-radius: 25px;
+        }
+
+        .input-field {
+            flex: 1;
+            background: none;
+            border: none;
+            color: #3D3F3D;
+            font-size: 16px;
+            outline: none;
+            resize: none;
+            min-height: 24px;
+        }
+
+        .send-button {
+            background-color: #4D6BFE;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 8px 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Messages */
+        .message {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 12px;
+            line-height: 1.8;
+            opacity: 0;
+            animation: slideUpFade 0.3s ease-out forwards;
+        }
+
+        .message-content {
+            padding: 12px;
+            border-radius: 8px;
+            max-width: 80%;
+            color: #3D3F3D;
+        }
+
+        .message.user-message{
+            flex-direction: row-reverse;
+        }
+
+        .user-message .message-content {
+            background-color: #eff6ff;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: #2C2D31;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Typing Indicator */
+        .typing {
+            display: flex;
+            gap: 4px;
+            padding: 12px;
+            background-color: #f9fbff;
+            border-radius: 8px;
+        }
+
+        .dot {
+            width: 8px;
+            height: 8px;
+            background-color: #ABB2BD;
+            border-radius: 50%;
+            animation: typing 1.4s infinite;
+        }
+
+        .dot:nth-child(2) { animation-delay: 0.2s; }
+        .dot:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes typing {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-4px); }
+        }
+    </style>
 </head>
 <body>
-    <div class="chat-container">
-        <header>
-            <img src="logo_foz.png" alt="Prefeitura de Foz do Iguaçu" class="logo-img">
-            <h1>Chat IA - Prefeitura de Foz do Iguaçu</h1>
-        </header>
-        <div class="chat-box" id="chat-box">
-            <div class="message bot">Bem-vindo ao Chat IA de Foz do Iguaçu! Como posso ajudar?</div>
+    <button class="menu-toggle" id="menuToggle">☰</button>
+    <div class="overlay" id="overlay"></div>
+    <div class="container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <img src="logo_foz.png" width="200" />
+                </div>
+                <!-- <div class="menu-button">☰</div> -->
+            </div>
         </div>
-        <div class="input-area">
-            <input type="text" id="user-input" placeholder="Digite sua mensagem...">
-            <button id="send-btn">Enviar</button>
+        
+        <div class="main-content">
+            <h3 style="text-align: center; padding: 20px; color: #0f0f0f;">Assistente virtual PGM</h3>
+            <div class="chat-container" id="chat-container">
+                <!-- Messages will be inserted here -->
+            </div>
+            
+            <div class="input-area">
+                <div class="input-container">
+                    <textarea 
+                        class="input-field" 
+                        placeholder="Digite sua mensagem..." 
+                        rows="1"
+                        id="message-input"
+                    ></textarea>
+                    <button class="send-button" id="send-button">
+                        Enviar
+                    </button>
+                </div>
+            </div>
         </div>
     </div>
 
     <script>
-        document.getElementById("send-btn").addEventListener("click", sendMessage);
-        document.getElementById("user-input").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                sendMessage();
-            }
-        });
+        const messageInput = document.getElementById('message-input');
+        const sendButton = document.getElementById('send-button');
+        const chatContainer = document.getElementById('chat-container');
 
-                // Gera um ID único para identificar a sessão do usuário
+        function sendWelcomeMessage() {
+        const welcomeMessage = `Olá! 👋
+    Sou o assistente virtual da Procuradoria Geral do Município de Foz do Iguaçu. Em que posso te ajudar hoje? Aqui está alguns serviços que talvez você precise.
+    -Consultar informações de processo
+    -Informações sobre protesto municipal
+    -Solicitar carta de anuência
+    -Atualizações de boletos
+    -Outras dúvidas`;
+        
+        setTimeout(() => {
+            addMessage(welcomeMessage);
+        }, 500); // Pequeno delay para melhor experiência
+    }
+
+    // Chamar a função quando a página carregar
+    document.addEventListener('DOMContentLoaded', sendWelcomeMessage);
+
+        // Gerando e armazenando sessionId
         const sessionId = localStorage.getItem("sessionId") || Math.random().toString(36).substr(2, 9);
         localStorage.setItem("sessionId", sessionId);
 
         function showTyping() {
-            const chatBox = document.getElementById("chat-box");
-            const typingBubble = document.createElement("div");
-            typingBubble.id = "isTyping";
-            typingBubble.classList.add("chat-bubble");
-            typingBubble.innerHTML = `
-                <div class="typing">
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                    <div class="dot"></div>
-                </div>
+            const typingDiv = document.createElement('div');
+            typingDiv.className = 'message';
+            typingDiv.id = 'isTyping';
+            
+            const avatar = document.createElement('div');
+            const profile = document.createElement('img');
+            profile.src = 'profile.png';
+            avatar.className = 'avatar';
+            avatar.appendChild(profile);
+            
+            const typing = document.createElement('div');
+            typing.className = 'typing';
+            typing.innerHTML = `
+                <div class="dot"></div>
+                <div class="dot"></div>
+                <div class="dot"></div>
             `;
-            chatBox.appendChild(typingBubble);
-            chatBox.scrollTop = chatBox.scrollHeight;
+            
+            typingDiv.appendChild(avatar);
+            typingDiv.appendChild(typing);
+            chatContainer.appendChild(typingDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
         }
 
         function hideTyping() {
@@ -56,21 +389,52 @@
             }
         }
 
+        function addMessage(content, isUser = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isUser ? 'user-message' : ''}`;
+            
+            const avatar = document.createElement('div');
+            const profile = document.createElement('img');
+            profile.src = 'profile.png';
+            avatar.className = 'avatar';
+            
+            isUser ? 'U' : avatar.appendChild(profile);
+            
+            const messageContent = document.createElement('div');
+            messageContent.className = 'message-content';
+            messageContent.innerHTML = content.replace(/\n/g, "<br>");
+            
+            isUser ? '' : messageDiv.appendChild(avatar);
+            // messageDiv.appendChild(avatar);
+            messageDiv.appendChild(messageContent);
+            messageDiv.style.opacity = '0';
+            chatContainer.appendChild(messageDiv);
+            
+            // Força um reflow para garantir que a animação funcione
+            messageDiv.offsetHeight;
+            
+            // Inicia a animação
+            messageDiv.style.opacity = '1';
+            
+            // Scroll suave para a nova mensagem
+            messageDiv.scrollIntoView({ behavior: 'smooth', block: 'end' });
+            chatContainer.appendChild(messageDiv);
+            
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
 
         async function sendMessage() {
-            const inputField = document.getElementById("user-input");
-            const message = inputField.value.trim();
+            const message = messageInput.value.trim();
             if (message === "") return;
 
-            const chatBox = document.getElementById("chat-box");
+            // Adiciona mensagem do usuário
+            addMessage(message, true);
+            messageInput.value = "";
 
-            // Exibir a mensagem do usuário no chat
-            const userMessage = document.createElement("div");
-            userMessage.classList.add("message", "user");
-            userMessage.textContent = message;
-            chatBox.appendChild(userMessage);
-            inputField.value = "";
+            // Ajusta altura do textarea
+            messageInput.style.height = 'auto';
 
+            // Mostra indicador de digitação
             showTyping();
 
             try {
@@ -78,27 +442,110 @@
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
                     body: JSON.stringify({ 
-                        session_id: sessionId, // Enviar o ID único da sessão
+                        session_id: sessionId,
                         text: message
                     })
                 });
 
                 const data = await response.json();
-
-                // Exibir a resposta da IA no chat
-                const botMessage = document.createElement("div");
-                botMessage.classList.add("message", "bot");
-                botMessage.innerHTML = data.text.replace(/\n/g, "<br>");
-                chatBox.appendChild(botMessage);
-                chatBox.scrollTop = chatBox.scrollHeight;
+                addMessage(data.text);
 
             } catch (error) {
                 console.error("Erro ao conectar com a IA:", error);
+                addMessage("Desculpe, ocorreu um erro ao processar sua mensagem.");
             } finally {
                 hideTyping();
             }
         }
 
+        // Event Listeners
+        sendButton.addEventListener('click', sendMessage);
+        
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+
+        // Auto-resize textarea
+        messageInput.addEventListener('input', function() {
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.querySelector('.sidebar');
+        const overlay = document.getElementById('overlay');
+        let hasNewMessage = false;
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('active');
+            overlay.classList.toggle('active');
+            
+            if (sidebar.classList.contains('active')) {
+                document.body.style.overflow = 'hidden';
+                menuToggle.innerHTML = '×';
+                menuToggle.classList.remove('new-message');
+                hasNewMessage = false;
+            } else {
+                document.body.style.overflow = '';
+                menuToggle.innerHTML = '☰';
+            }
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('active');
+            overlay.classList.remove('active');
+            document.body.style.overflow = '';
+            menuToggle.innerHTML = '☰';
+        }
+
+        menuToggle.addEventListener('click', toggleSidebar);
+        overlay.addEventListener('click', closeSidebar);
+
+        // Fechar sidebar ao redimensionar para desktop
+        window.addEventListener('resize', () => {
+            if (window.innerWidth > 768) {
+                closeSidebar();
+            }
+        });
+
+        // Modificar a função addMessage para notificar novas mensagens
+        const originalAddMessage = addMessage;
+        addMessage = function(content, isUser = false) {
+            originalAddMessage(content, isUser);
+        };
+
+        // Adicionar swipe para abrir/fechar sidebar
+        let touchStartX = 0;
+        let touchEndX = 0;
+
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, false);
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, false);
+
+        function handleSwipe() {
+            const swipeThreshold = 50;
+            const diff = touchEndX - touchStartX;
+
+            if (Math.abs(diff) < swipeThreshold) return;
+
+            if (diff > 0 && touchStartX < 30) {
+                // Swipe direita (abrir)
+                if (!sidebar.classList.contains('active')) {
+                    toggleSidebar();
+                }
+            } else if (diff < 0 && sidebar.classList.contains('active')) {
+                // Swipe esquerda (fechar)
+                closeSidebar();
+            }
+        }
     </script>
 </body>
 </html>

@@ -112,7 +112,7 @@ header h1 {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    background: #f9f9f9;
+    background: #ffffff;
     border-bottom: 3px solid #00796b;
 }
 
@@ -208,7 +208,7 @@ input {
   width: 100%;
   padding: 10px;
   margin: 10px 0;
-  border: 1px solid #ccc;
+  border: 1px solid #ffffff;
   border-radius: 8px;
 }
 
